@@ -1,0 +1,23 @@
+{
+    "name": "Adblocker",
+    "version": "1.0",
+    "description": "simple Adblocker",
+    "permissions": [
+        "declarativeNetRequest",
+        "declarativeNetRequestWithHostAccess",
+        "activeTab",
+        "scripting"
+    ],
+    "background": {
+        "service_worker": "background.js"
+    },
+    "icons": {
+        "16": "icons/logo_16x16.png",
+        "48": "icons/logo_48x48.png",
+        "128": "icons/logo_128x128.png"
+    },
+    "action": {
+        "default_popup": "popup.html"
+    },
+    "manifest_version": 3
+}
