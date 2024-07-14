@@ -18,7 +18,42 @@ const rules = defaultFilters.map((filter, index) => ({
     condition: { urlFilter: filter }
 }));
 
-chrome.declarativeNetRequest.updateDynamicRules({
-    addRules: rules,
-    removeRuleIds: rules.map(rule => rule.id)
+chrome.runtime.onInstalled.addListener(() => {
+    // Check the initial state from storage and apply rules if needed
+    chrome.storage.sync.get(['adblockerEnabled'], (result) => {
+        if (result.adblockerEnabled) {
+            enableAdblocker();
+        }
+    });
 });
+
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    if (message.type === 'TOGGLE_ADBLOCKER') {
+        if (message.enabled) {
+            enableAdblocker();
+        } else {
+            disableAdblocker();
+        }
+    }
+});
+
+function enableAdblocker() {
+    // First, remove all existing rules
+    chrome.declarativeNetRequest.getDynamicRules((existingRules) => {
+        const existingRuleIds = existingRules.map(rule => rule.id);
+        chrome.declarativeNetRequest.updateDynamicRules({
+            removeRuleIds: existingRuleIds,
+            addRules: rules
+        });
+    });
+}
+
+function disableAdblocker() {
+    // Remove all rules
+    chrome.declarativeNetRequest.getDynamicRules((existingRules) => {
+        const existingRuleIds = existingRules.map(rule => rule.id);
+        chrome.declarativeNetRequest.updateDynamicRules({
+            removeRuleIds: existingRuleIds
+        });
+    });
+}
